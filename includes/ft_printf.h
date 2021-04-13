@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 22:31:37 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 15:40:11 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/13 15:33:39 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,17 +73,19 @@ int						ft_fprintf(const int fd, const char *s, ...);
 
 const char				*ftprintf_read_args(const char *s, t_printf *f);
 
-void					ftprintf_convert_p(t_printf *f, const char *s);
-void					ftprintf_convert_i(t_printf *f);
-void					ftprintf_convert_ui(t_printf *f, const char *s);
-void					ftprintf_convert_f(t_printf *f);
+int						ftprintf_typecheck(t_printf *f, const char *s);
+
+int						ftprintf_convert_p(t_printf *f, const char *s);
+int						ftprintf_convert_i(t_printf *f);
+int						ftprintf_convert_ui(t_printf *f, const char *s);
+int						ftprintf_convert_f(t_printf *f);
 
 char					*ftprintf_sgn(t_printf *f, char *p, char *s, t_bool i);
 
-void					ftprintf_print_i(t_printf *f);
-void					ftprintf_print_f(t_printf *f);
-void					ftprintf_print_str(t_printf *f);
-void					ftprintf_str(t_printf *f);
-void					ftprintf_c(t_printf *f);
+int						ftprintf_print_i(t_printf *f);
+int						ftprintf_print_f(t_printf *f);
+int						ftprintf_print_str(t_printf *f);
+int						ftprintf_str(t_printf *f);
+int						ftprintf_c(t_printf *f);
 
 #endif

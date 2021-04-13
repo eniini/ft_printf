@@ -2,13 +2,14 @@ NAME = libftprintf.a
 
 #compiler
 CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror -Wformat -Wvarargs
+CFLAGS	= -Wall -Wextra -Werror -Wformat -Wvarargs -g
 
 #VPATH is used to gather sources from multiple directories
 #sources
 VPATH := ./src
-SRCS	:=	ft_printf.c 
+SRCS	:=	ft_printf.c
 SRCS	+=	ftprintf_read_args.c \
+			ftprintf_typecheck.c \
 			ftprintf_integer.c \
 			ftprintf_float.c \
 			ftprintf_str.c \
@@ -17,9 +18,10 @@ SRCS	+=	ftprintf_read_args.c \
 			ftprintf_sign.c
 
 #libft sources
-VPATH += ./libft/srcs/process_control:./libft/srcs/file_io:./libft/srcs/math:\
-./libft/srcs/type_conversion:./libft/srcs/string_utils:./libft/srcs/mem_utils \
-./libft/srcs/wchar_utils
+VPATH += ./libft/srcs/char_utils:./libft/srcs/process_control: \
+./libft/srcs/file_io:./libft/srcs/math:./libft/srcs/type_conversion: \
+./libft/srcs/string_utils:./libft/srcs/mem_utils ./libft/srcs/wchar_utils
+SRCS	+=	ft_isalpha.c
 SRCS	+=	ft_getout.c
 SRCS	+=	ft_putchar_fd.c \
 			ft_putendl_fd.c \

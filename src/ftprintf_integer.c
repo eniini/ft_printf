@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 12:07:19 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 18:19:56 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/13 15:17:07 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static char		*check_flags(t_printf *f, char *s, size_t conv_l, size_t str_l)
 			i = str_l - f->info.i_prec;
 		if ((f->info.showsign || f->info.space || f->info.negative) && i)
 			i--;
-		if ((f->info.is_hex_l || f->info.is_hex_u) && i)
+		if ((f->info.is_hex_l || f->info.is_hex_u) && i >= 2)
 			i -= 2;
 		if (*f->conversion == '0' && f->info.zero_prec && f->info.width)
 			i++;
@@ -58,16 +58,16 @@ static size_t	get_size(t_printf *f)
 
 	i = ft_strlen(f->conversion);
 	j = 0;
-	if (f->info.i_prec <= i && f->info.is_octal)
+	if (f->info.i_prec <= i && f->info.is_octal && *f->conversion != '0')
 		f->info.i_prec = i + 1;
 	if (f->info.is_hex_l || f->info.is_hex_u)
 		j += 2;
 	if (f->info.showsign || f->info.space || f->info.negative)
 		i++;
-	if ((f->info.i_prec > i) && (f->info.i_prec > f->info.width) &&
+	if ((f->info.i_prec > i + j) && (f->info.i_prec > f->info.width) &&
 	(f->info.showsign || f->info.space || f->info.negative))
 		return (f->info.i_prec + 1);
-	else if (f->info.i_prec > i && f->info.i_prec > f->info.width)
+	else if (f->info.i_prec > i + j && f->info.i_prec > f->info.width)
 		return (f->info.i_prec + j);
 	else if (f->info.width > i + j)
 		return (f->info.width);
@@ -83,18 +83,22 @@ static size_t	get_size(t_printf *f)
 static char		*init_str(t_printf *f)
 {
 	char	*str;
+	size_t	i;
 
+	i = 0;
+	if (f->info.is_hex_l || f->info.is_hex_u)
+		i = 2;
 	if (*f->conversion == '-')
 	{
 		f->info.negative = 1;
-		if (!(str = ft_strdup(f->conversion + 1)))
-			ft_getout(MEMERR);
+		if (!(str = ft_strdup(f->conversion + 1 + i)))
+			return (NULL);
 		free(f->conversion);
 		f->conversion = str;
 		str = NULL;
 	}
-	if (!(str = ft_strnew(get_size(f) + 1)))
-		ft_getout(MEMERR);
+	if (!(str = ft_strnew(get_size(f) + 1 + i)))
+		return (NULL);
 	return (str);
 }
 
@@ -103,13 +107,14 @@ static char		*init_str(t_printf *f)
 **	for the alternative (#) octal implementation (prints a single 0).
 */
 
-void			ftprintf_print_i(t_printf *f)
+int				ftprintf_print_i(t_printf *f)
 {
 	size_t	conv_l;
 	char	*str;
 	char	*p;
 
-	str = init_str(f);
+	if (!(str = init_str(f)))
+		return (-1);
 	conv_l = ft_strlen(f->conversion);
 	if (!f->info.i_prec && !f->info.zero_prec && f->info.zeroed
 	&& !f->info.left)
@@ -122,9 +127,11 @@ void			ftprintf_print_i(t_printf *f)
 		ft_memset(p, '0', (f->info.i_prec - conv_l));
 		p += (f->info.i_prec - conv_l);
 	}
-	if (!(*f->conversion == '0' && f->info.zero_prec))
+	if (!(*f->conversion == '0' && f->info.zero_prec && !f->info.is_octal))
 		ft_memcpy(p, f->conversion, conv_l);
 	ft_putstr_fd(str, f->fd);
 	f->writecount += ft_strlen(str);
 	free(str);
+	free(f->conversion);
+	return (1);
 }

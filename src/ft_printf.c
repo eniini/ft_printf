@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/29 16:49:11 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 17:34:45 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/13 17:43:49 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,33 +17,6 @@
 */
 
 #include "ft_printf.h"
-
-/*
-**	Catches unsupported inputs after the control character.
-*/
-
-static void		ftprintf_typecheck(t_printf *f, const char *s)
-{
-	if (*s == 's')
-		ftprintf_str(f);
-	else if (*s == 'c')
-		ftprintf_c(f);
-	else if (*s == 'd' || *s == 'i')
-		ftprintf_convert_i(f);
-	else if (*s == 'u' || *s == 'o' || *s == 'x' || *s == 'X')
-		ftprintf_convert_ui(f, s);
-	else if (*s == 'f')
-		ftprintf_convert_f(f);
-	else if (*s == 'p')
-		ftprintf_convert_p(f, s);
-	else if (*s == '%')
-	{
-		ft_putchar_fd('%', f->fd);
-		f->writecount++;
-	}
-	else
-		ft_getout(CONVERR);
-}
 
 static void		printf_reset(t_printf *f)
 {
@@ -59,10 +32,36 @@ static t_printf	*printf_init(const int fd)
 	t_printf	*f;
 
 	if (!(f = (t_printf*)malloc(sizeof(t_printf))))
-		ft_getout(MEMERR);
+		return (NULL);
 	f->writecount = 0;
 	f->fd = fd;
 	return (f);
+}
+
+/*
+**	Returns 0 if any subfunctions return an error.
+*/
+
+static int		loop(t_printf *f, const char *s)
+{
+	while (*s && *s != '\0')
+	{
+		if (*s == '%')
+		{
+			s++;
+			printf_reset(f);
+			if (!(s = ftprintf_read_args(s, f)))
+				return (0);
+			if (ftprintf_typecheck(f, s) == -1)
+				return (0);
+			s++;
+		}
+		else
+			f->writecount += write(f->fd, s++, 1);
+	}
+	if (s == NULL)
+		return (0);
+	return (1);
 }
 
 /*
@@ -74,20 +73,13 @@ int				ft_printf(const char *s, ...)
 	t_printf	*f;
 	int			ret_count;
 
-	f = printf_init(1);
+	if (!(f = printf_init(1)))
+		return (-1);
 	va_start(f->args, s);
-	while (*s && *s != '\0')
+	if (!(loop(f, s)))
 	{
-		if (*s == '%')
-		{
-			s++;
-			printf_reset(f);
-			s = ftprintf_read_args(s, f);
-			ftprintf_typecheck(f, s);
-			s++;
-		}
-		else
-			f->writecount += write(1, s++, 1);
+		free(f);
+		return (-1);
 	}
 	va_end(f->args);
 	ret_count = (int)f->writecount;
@@ -104,20 +96,13 @@ int				ft_fprintf(const int fd, const char *s, ...)
 	t_printf	*f;
 	int			ret_count;
 
-	f = printf_init(fd);
+	if (!(f = printf_init(fd)))
+		return (-1);
 	va_start(f->args, s);
-	while (*s && *s != '\0')
+	if (!(loop(f, s)))
 	{
-		if (*s == '%')
-		{
-			s++;
-			printf_reset(f);
-			s = ftprintf_read_args(s, f);
-			ftprintf_typecheck(f, s);
-			s++;
-		}
-		else
-			f->writecount += write(f->fd, s++, 1);
+		free(f);
+		return (-1);
 	}
 	va_end(f->args);
 	ret_count = (int)f->writecount;

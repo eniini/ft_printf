@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/02 15:49:27 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 18:26:34 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/11 20:56:29 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,5 @@ char		*ftprintf_sgn(t_printf *f, char *p, char *str, t_bool i)
 			*p = c;
 		p++;
 	}
-	p = add_hex_prefix(f, p, str);
-	return (p);
+	return (add_hex_prefix(f, p, str));
 }

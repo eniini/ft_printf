@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 14:02:52 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 15:35:32 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/09 14:03:10 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,22 +26,27 @@ static void	printf_char(t_printf *f)
 	}
 }
 
-/*
-**	Handles padding to either side of printed char.
-*/
-
-void		ftprintf_c(t_printf *f)
+static void	init_c(t_printf *f)
 {
-	char	*str;
-
 	if (f->info.is_long)
 		f->data.wc = va_arg(f->args, wint_t);
 	else
 		f->data.unsign_i = (unsigned int)va_arg(f->args, int);
+}
+
+/*
+**	Handles padding to either side of printed char.
+*/
+
+int			ftprintf_c(t_printf *f)
+{
+	char	*str;
+
+	init_c(f);
 	if (!f->info.left && f->info.width)
 	{
 		if (!(str = ft_strnew(f->info.width)))
-			ft_getout(MEMERR);
+			return (-1);
 		ft_memset(str, ' ', f->info.width - 1);
 		ft_putstr_fd(str, f->fd);
 		free(str);
@@ -51,10 +56,11 @@ void		ftprintf_c(t_printf *f)
 	if (f->info.left && f->info.width)
 	{
 		if (!(str = ft_strnew(f->info.width)))
-			ft_getout(MEMERR);
+			return (-1);
 		ft_memset(str, ' ', f->info.width - 1);
 		ft_putstr_fd(str, f->fd);
 		free(str);
 		f->writecount += (f->info.width - 1);
 	}
+	return (1);
 }

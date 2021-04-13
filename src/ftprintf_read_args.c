@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/02 15:49:10 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/03 23:41:35 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/13 14:48:43 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,14 @@ static const char	*check_modifiers(const char *s, t_printf *f)
 		else
 			f->info.is_long = 1;
 	}
-	if (*s == 'h' && s++)
+	else if (*s == 'h' && s++)
 	{
 		if (*s == 'h' && s++)
 			f->info.is_char = 1;
 		else
 			f->info.is_short = 1;
 	}
-	if (*s == 'L' && s++)
+	else if (*s == 'L' && s++)
 		f->info.is_double = 1;
 	return (s);
 }
@@ -111,7 +111,7 @@ static const char	*check_width(const char *s, t_printf *f)
 		while ((*s >= '0' && *s <= '9') && s++)
 			i++;
 		if (!(str = ft_strndup(p, i)))
-			ft_getout(MEMERR);
+			return (NULL);
 		f->info.width = ft_atoi(str);
 		free(str);
 	}
@@ -143,7 +143,8 @@ const char			*ftprintf_read_args(const char *s, t_printf *f)
 			f->info.space = 1;
 		s++;
 	}
-	ret_s = check_width(s, f);
+	if (!(ret_s = check_width(s, f)))
+		return (NULL);
 	if (*ret_s == '.')
 		ret_s = check_precision(ret_s, f);
 	else

@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 12:07:38 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/04 17:04:01 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/09 17:56:21 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ static char		*check_flags(t_printf *f, char *s, size_t conv_l)
 			else
 				i = f->info.width - conv_l;
 			if ((f->info.space || f->info.showsign || f->info.negative) && i)
+				i--;
+			if (f->info.zero_prec && f->info.alt)
 				i--;
 		}
 		p = &s[i];
@@ -64,14 +66,14 @@ static char		*init_f_str(t_printf *f)
 	{
 		f->info.negative = 1;
 		if (!(str = ft_strdup(f->conversion + 1)))
-			ft_getout(MEMERR);
+			return (NULL);
 		free(f->conversion);
 		f->conversion = str;
 		str = NULL;
 	}
 	str_l = get_size(f);
 	if (!(str = ft_strnew(str_l + 1)))
-		ft_getout(MEMERR);
+		return (NULL);
 	if (f->info.zeroed && !f->info.left)
 		ft_memset(str, '0', str_l);
 	else
@@ -85,13 +87,14 @@ static char		*init_f_str(t_printf *f)
 **	is added for values without decimal precision.
 */
 
-void			ftprintf_print_f(t_printf *f)
+int				ftprintf_print_f(t_printf *f)
 {
 	size_t	conv_l;
 	char	*str;
 	char	*p;
 
-	str = init_f_str(f);
+	if (!(str = init_f_str(f)))
+		return (-1);
 	conv_l = ft_strlen(f->conversion);
 	p = check_flags(f, str, conv_l);
 	ft_memcpy(p, f->conversion, conv_l);
@@ -106,4 +109,6 @@ void			ftprintf_print_f(t_printf *f)
 	ft_putstr_fd(str, f->fd);
 	f->writecount += ft_strlen(str);
 	free(str);
+	free(f->conversion);
+	return (1);
 }
