@@ -2,7 +2,7 @@ NAME = libftprintf.a
 
 #compiler
 CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror -Wformat -Wvarargs -g
+CFLAGS	= -Wall -Wextra -Werror -Wformat -Wvarargs
 
 #VPATH is used to gather sources from multiple directories
 #sources
