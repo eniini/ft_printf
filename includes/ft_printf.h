@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 22:31:37 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 15:33:39 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 18:05:02 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,7 @@
 # include <stdarg.h>
 # include "../libft/includes/libft.h"
 
-# define MEMERR "[FT_PRINTF] Memory allocation failure."
-# define CONVERR "[FT_PRINTF] Invalid or missing conversion specifier."
-
-typedef struct			s_data
+typedef struct s_data
 {
 	void				*p;
 	char				*s;
@@ -35,7 +32,7 @@ typedef struct			s_data
 	unsigned long long	unsign_i;
 }						t_data;
 
-typedef struct			s_info
+typedef struct s_info
 {
 	unsigned int		i_prec;
 	unsigned int		f_prec;
@@ -50,7 +47,7 @@ typedef struct			s_info
 	unsigned int		showsign;
 	unsigned int		zeroed;
 	unsigned int		is_double;
-	unsigned int		zero_prec;
+	unsigned int		zero_p;
 	unsigned int		negative;
 	unsigned int		is_hex_l;
 	unsigned int		is_hex_u;
@@ -58,7 +55,7 @@ typedef struct			s_info
 	size_t				fract_i;
 }						t_info;
 
-typedef struct			s_printf
+typedef struct s_printf
 {
 	t_data				data;
 	t_info				info;

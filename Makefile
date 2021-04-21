@@ -26,7 +26,8 @@ SRCS	+=	ft_getout.c
 SRCS	+=	ft_putchar_fd.c \
 			ft_putendl_fd.c \
 			ft_putstr_fd.c
-SRCS	+=	ft_pow.c
+SRCS	+=	ft_abs.c \
+			ft_pow.c
 SRCS	+=	ft_atoi.c \
 			ft_itoa.c \
 			ft_itoa_base.c \
@@ -62,25 +63,31 @@ INC_DIR	:=	./includes
 INC_DIR	+=	./libft/includes
 IFLAGS	+=	$(foreach d, $(INC_DIR), -I$d)
 
+#colors
 NC		= \033[0m
 PURPLE	= \033[1;35m
+#clear line, move backwards x columns
+RESET	= \033[1K\033[50D
 
 all: $(NAME)
 
 $(OBJ_DIR)/%.o:%.c
+	@echo -ne "$(PURPLE)."
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CFLAGS) $(IFLAGS) -o $@ -c $<
 
-$(NAME): $(OBJS)
-	@echo "${PURPLE}[ftprintf] building library...${NC}"
+$(NAME) : $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	@echo -e "$(PURPLE)$(RESET)[ftprintf] library built!$(NC)"
 
 clean :
-	@echo "${PURPLE}[ftprintf] removing object files...${NC}"
 	@rm -rf $(OBJ_DIR)
+	@make -C libft clean
+	@echo -e "$(PURPLE)[ftprintf] object files removed$(NC)"
 
 fclean : clean
-	@echo "${PURPLE}[ftprintf] removing binary...${NC}"
+	@echo -e "$(PURPLE)[ftprintf] archive removed $(NC)"
 	@rm -f $(NAME)
+	@make -C libft fclean
 
 re : fclean all

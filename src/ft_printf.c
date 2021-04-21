@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/29 16:49:11 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 17:43:49 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 17:53:59 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,21 @@
 
 #include "ft_printf.h"
 
-static void		printf_reset(t_printf *f)
+static void	printf_reset(t_printf *f)
 {
 	f->data.s = NULL;
 	f->data.ws = NULL;
 	f->conversion = NULL;
 	f->info = (t_info){0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
 static t_printf	*printf_init(const int fd)
 {
 	t_printf	*f;
 
-	if (!(f = (t_printf*)malloc(sizeof(t_printf))))
+	f = (t_printf *)malloc(sizeof(t_printf));
+	if (!f)
 		return (NULL);
 	f->writecount = 0;
 	f->fd = fd;
@@ -42,7 +43,7 @@ static t_printf	*printf_init(const int fd)
 **	Returns 0 if any subfunctions return an error.
 */
 
-static int		loop(t_printf *f, const char *s)
+static int	loop(t_printf *f, const char *s)
 {
 	while (*s && *s != '\0')
 	{
@@ -50,7 +51,8 @@ static int		loop(t_printf *f, const char *s)
 		{
 			s++;
 			printf_reset(f);
-			if (!(s = ftprintf_read_args(s, f)))
+			s = ftprintf_read_args(s, f);
+			if (!s)
 				return (0);
 			if (ftprintf_typecheck(f, s) == -1)
 				return (0);
@@ -68,12 +70,13 @@ static int		loop(t_printf *f, const char *s)
 **	Writes results to stdout.
 */
 
-int				ft_printf(const char *s, ...)
+int	ft_printf(const char *s, ...)
 {
 	t_printf	*f;
 	int			ret_count;
 
-	if (!(f = printf_init(1)))
+	f = printf_init(1);
+	if (!f)
 		return (-1);
 	va_start(f->args, s);
 	if (!(loop(f, s)))
@@ -91,12 +94,13 @@ int				ft_printf(const char *s, ...)
 **	Writes results to file descriptor [fd].
 */
 
-int				ft_fprintf(const int fd, const char *s, ...)
+int	ft_fprintf(const int fd, const char *s, ...)
 {
 	t_printf	*f;
 	int			ret_count;
 
-	if (!(f = printf_init(fd)))
+	f = printf_init(fd);
+	if (!f)
 		return (-1);
 	va_start(f->args, s);
 	if (!(loop(f, s)))

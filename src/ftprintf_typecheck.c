@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/13 15:33:55 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 17:34:00 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 17:20:11 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 **	Returns (-1) if any conversion encounters an issue.
 */
 
-int		ftprintf_typecheck(t_printf *f, const char *s)
+int	ftprintf_typecheck(t_printf *f, const char *s)
 {
 	if (*s == '\0')
 		return (-1);

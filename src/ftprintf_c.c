@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 14:02:52 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/09 14:03:10 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 17:23:42 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,15 @@ static void	init_c(t_printf *f)
 **	Handles padding to either side of printed char.
 */
 
-int			ftprintf_c(t_printf *f)
+int	ftprintf_c(t_printf *f)
 {
 	char	*str;
 
 	init_c(f);
 	if (!f->info.left && f->info.width)
 	{
-		if (!(str = ft_strnew(f->info.width)))
+		str = ft_strnew(f->info.width);
+		if (!str)
 			return (-1);
 		ft_memset(str, ' ', f->info.width - 1);
 		ft_putstr_fd(str, f->fd);
@@ -55,7 +56,8 @@ int			ftprintf_c(t_printf *f)
 	printf_char(f);
 	if (f->info.left && f->info.width)
 	{
-		if (!(str = ft_strnew(f->info.width)))
+		str = ft_strnew(f->info.width);
+		if (!str)
 			return (-1);
 		ft_memset(str, ' ', f->info.width - 1);
 		ft_putstr_fd(str, f->fd);

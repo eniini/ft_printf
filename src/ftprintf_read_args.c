@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/02 15:49:10 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 14:48:43 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 18:04:18 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static const char	*check_modifiers(const char *s, t_printf *f)
 **	Negative precision argument for (*) is handled as if it was omitted.
 */
 
-static void			get_p_val(t_printf *f, int i, t_bool p)
+static void	get_p_val(t_printf *f, int i, t_bool p)
 {
 	if (!p)
 	{
@@ -53,7 +53,7 @@ static void			get_p_val(t_printf *f, int i, t_bool p)
 		else
 			f->info.f_prec = 6;
 		if (i == 0)
-			f->info.zero_prec = 1;
+			f->info.zero_p = 1;
 		return ;
 	}
 	if (i > 0)
@@ -62,7 +62,7 @@ static void			get_p_val(t_printf *f, int i, t_bool p)
 		f->info.f_prec = i;
 	}
 	else
-		f->info.zero_prec = 1;
+		f->info.zero_p = 1;
 }
 
 static const char	*check_precision(const char *s, t_printf *f)
@@ -85,7 +85,7 @@ static const char	*check_precision(const char *s, t_printf *f)
 	}
 	if (!i)
 	{
-		f->info.zero_prec = 1;
+		f->info.zero_p = 1;
 		return (s);
 	}
 	i = ft_atoi(p);
@@ -99,10 +99,9 @@ static const char	*check_precision(const char *s, t_printf *f)
 
 static const char	*check_width(const char *s, t_printf *f)
 {
-	size_t		i;
+	int			i;
 	const char	*p;
 	char		*str;
-	int			asterisk;
 
 	if (*s >= '0' && *s <= '9')
 	{
@@ -110,22 +109,23 @@ static const char	*check_width(const char *s, t_printf *f)
 		p = s;
 		while ((*s >= '0' && *s <= '9') && s++)
 			i++;
-		if (!(str = ft_strndup(p, i)))
+		str = ft_strndup(p, (size_t)i);
+		if (!str)
 			return (NULL);
 		f->info.width = ft_atoi(str);
 		free(str);
 	}
 	else if (*s == '*' && s++)
 	{
-		asterisk = va_arg(f->args, int);
-		f->info.width = (asterisk < 0) ? -asterisk : asterisk;
-		if (asterisk < 0)
+		i = va_arg(f->args, int);
+		if (i < 0)
 			f->info.left = 1;
+		f->info.width = ft_abs(i);
 	}
 	return (s);
 }
 
-const char			*ftprintf_read_args(const char *s, t_printf *f)
+const char	*ftprintf_read_args(const char *s, t_printf *f)
 {
 	const char	*ret_s;
 
@@ -143,7 +143,8 @@ const char			*ftprintf_read_args(const char *s, t_printf *f)
 			f->info.space = 1;
 		s++;
 	}
-	if (!(ret_s = check_width(s, f)))
+	ret_s = check_width(s, f);
+	if (!ret_s)
 		return (NULL);
 	if (*ret_s == '.')
 		ret_s = check_precision(ret_s, f);

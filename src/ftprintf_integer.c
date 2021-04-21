@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 12:07:19 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 15:17:07 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/21 19:07:12 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,12 @@
 **	is written. [i] initialization avoids possible unsigned overflow.
 */
 
-static char		*check_flags(t_printf *f, char *s, size_t conv_l, size_t str_l)
+static char	*check_flags(t_printf *f, char *s, size_t conv_l, size_t str_l)
 {
 	size_t	i;
-	char	*p;
 
 	if (f->info.left)
-	{
 		i = 0;
-		p = s;
-	}
 	else
 	{
 		if (str_l < conv_l || str_l < f->info.i_prec)
@@ -39,11 +35,12 @@ static char		*check_flags(t_printf *f, char *s, size_t conv_l, size_t str_l)
 			i--;
 		if ((f->info.is_hex_l || f->info.is_hex_u) && i >= 2)
 			i -= 2;
-		if (*f->conversion == '0' && f->info.zero_prec && f->info.width)
+		else if ((f->info.is_hex_l || f->info.is_hex_u) && i >= 1)
+			i -= 1;
+		if (*f->conversion == '0' && f->info.zero_p && f->info.width)
 			i++;
-		p = &s[i];
 	}
-	return (ftprintf_sgn(f, p, s, TRUE));
+	return (ftprintf_sgn(f, &s[i], s, TRUE));
 }
 
 /*
@@ -64,8 +61,8 @@ static size_t	get_size(t_printf *f)
 		j += 2;
 	if (f->info.showsign || f->info.space || f->info.negative)
 		i++;
-	if ((f->info.i_prec > i + j) && (f->info.i_prec > f->info.width) &&
-	(f->info.showsign || f->info.space || f->info.negative))
+	if ((f->info.i_prec > i + j) && (f->info.i_prec > f->info.width)
+		&& (f->info.showsign || f->info.space || f->info.negative))
 		return (f->info.i_prec + 1);
 	else if (f->info.i_prec > i + j && f->info.i_prec > f->info.width)
 		return (f->info.i_prec + j);
@@ -80,7 +77,7 @@ static size_t	get_size(t_printf *f)
 **	into specific position while adding signs and precision zeroes in front.
 */
 
-static char		*init_str(t_printf *f)
+static char	*init_str(t_printf *f)
 {
 	char	*str;
 	size_t	i;
@@ -91,13 +88,15 @@ static char		*init_str(t_printf *f)
 	if (*f->conversion == '-')
 	{
 		f->info.negative = 1;
-		if (!(str = ft_strdup(f->conversion + 1 + i)))
+		str = ft_strdup(f->conversion + 1 + i);
+		if (!str)
 			return (NULL);
 		free(f->conversion);
 		f->conversion = str;
 		str = NULL;
 	}
-	if (!(str = ft_strnew(get_size(f) + 1 + i)))
+	str = ft_strnew(get_size(f) + 1 + i);
+	if (!str)
 		return (NULL);
 	return (str);
 }
@@ -107,17 +106,17 @@ static char		*init_str(t_printf *f)
 **	for the alternative (#) octal implementation (prints a single 0).
 */
 
-int				ftprintf_print_i(t_printf *f)
+int	ftprintf_print_i(t_printf *f)
 {
 	size_t	conv_l;
 	char	*str;
 	char	*p;
 
-	if (!(str = init_str(f)))
+	str = init_str(f);
+	if (!str)
 		return (-1);
 	conv_l = ft_strlen(f->conversion);
-	if (!f->info.i_prec && !f->info.zero_prec && f->info.zeroed
-	&& !f->info.left)
+	if (!f->info.i_prec && !f->info.zero_p && f->info.zeroed && !f->info.left)
 		ft_memset(str, '0', f->info.width);
 	else
 		ft_memset(str, ' ', f->info.width);
@@ -127,7 +126,7 @@ int				ftprintf_print_i(t_printf *f)
 		ft_memset(p, '0', (f->info.i_prec - conv_l));
 		p += (f->info.i_prec - conv_l);
 	}
-	if (!(*f->conversion == '0' && f->info.zero_prec && !f->info.is_octal))
+	if (!(*f->conversion == '0' && f->info.zero_p && !f->info.is_octal))
 		ft_memcpy(p, f->conversion, conv_l);
 	ft_putstr_fd(str, f->fd);
 	f->writecount += ft_strlen(str);

@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 12:08:25 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 15:13:18 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/20 18:03:44 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static size_t	get_size(t_printf *f, size_t strl)
 **	Precisions smaller than [strl] result in data truncation.
 */
 
-void			handle_offset(t_printf *f, size_t strl, char *str)
+void	handle_offset(t_printf *f, size_t strl, char *str)
 {
 	char	*p;
 	size_t	offset;
@@ -64,7 +64,7 @@ void			handle_offset(t_printf *f, size_t strl, char *str)
 		ft_memcpy(p, f->conversion, offset);
 }
 
-int				ftprintf_print_str(t_printf *f)
+int	ftprintf_print_str(t_printf *f)
 {
 	size_t	strl;
 	size_t	output_size;
@@ -72,7 +72,8 @@ int				ftprintf_print_str(t_printf *f)
 
 	strl = ft_strlen(f->conversion);
 	output_size = get_size(f, strl);
-	if (!(str = ft_strnew(output_size)))
+	str = ft_strnew(output_size);
+	if (!str)
 		return (-1);
 	ft_memset(str, ' ', output_size);
 	handle_offset(f, strl, str);
@@ -88,13 +89,14 @@ int				ftprintf_print_str(t_printf *f)
 **	so that is handled here as well.
 */
 
-static int		print_str_extend(t_printf *f)
+static int	print_str_extend(t_printf *f)
 {
 	char	*s;
 
-	if (f->info.zero_prec)
+	if (f->info.zero_p)
 	{
-		if (!(s = ft_strnew(f->info.width + 1)))
+		s = ft_strnew(f->info.width + 1);
+		if (!s)
 			return (-1);
 		ft_memset(s, ' ', f->info.width);
 		ft_putstr_fd(s, f->fd);
@@ -118,13 +120,13 @@ static int		print_str_extend(t_printf *f)
 **	in par with Berkeley/Sun implementation.
 */
 
-int				ftprintf_str(t_printf *f)
+int	ftprintf_str(t_printf *f)
 {
 	if (f->info.is_long)
-		f->data.ws = va_arg(f->args, wchar_t*);
+		f->data.ws = va_arg(f->args, wchar_t *);
 	else
 	{
-		f->data.s = va_arg(f->args, char*);
+		f->data.s = va_arg(f->args, char *);
 		if (f->data.s == NULL && !f->info.is_long)
 			f->conversion = ft_strdup("(null)");
 		else if (f->data.s)
@@ -134,9 +136,10 @@ int				ftprintf_str(t_printf *f)
 	}
 	if (f->data.ws == NULL && f->info.is_long)
 	{
-		if (!(f->data.ws = ft_memalloc(sizeof(wchar_t) * 7)))
+		f->data.ws = ft_memalloc(sizeof(wchar_t) * 7);
+		if (!f->data.ws)
 			return (-1);
-		ft_memcpy((void*)f->data.ws, (void*)L"(null)", sizeof(wchar_t) * 6);
+		ft_memcpy((void *)f->data.ws, (void *)L"(null)", sizeof(wchar_t) * 6);
 	}
 	return (print_str_extend(f));
 }

@@ -6,7 +6,7 @@
 /*   By: eniini <eniini@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/01 10:02:08 by eniini            #+#    #+#             */
-/*   Updated: 2021/04/13 14:51:29 by eniini           ###   ########.fr       */
+/*   Updated: 2021/04/21 18:50:28 by eniini           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void	add_prefix(t_printf *f, const char *s)
 		if (*s == 'X' && f->info.alt && f->data.unsign_i != 0)
 			f->info.is_hex_u = 1;
 		else if ((*s == 'x' && f->info.alt && f->data.unsign_i != 0)
-		|| *s == 'p')
+			|| *s == 'p')
 			f->info.is_hex_l = 1;
 	}
 	if (*s == 'X')
@@ -47,12 +47,13 @@ static void	add_prefix(t_printf *f, const char *s)
 **	Glibc-styled null pointer output.
 */
 
-int			ftprintf_convert_p(t_printf *f, const char *s)
+int	ftprintf_convert_p(t_printf *f, const char *s)
 {
-	f->data.unsign_i = (size_t)va_arg(f->args, void*);
+	f->data.unsign_i = (size_t)va_arg(f->args, void *);
 	if (f->data.unsign_i == 0)
 	{
-		if (!(f->conversion = ft_strdup("(nil)")))
+		f->conversion = ft_strdup("(nil)");
+		if (!f->conversion)
 			return (-1);
 		return (ftprintf_print_str(f));
 	}
@@ -63,7 +64,7 @@ int			ftprintf_convert_p(t_printf *f, const char *s)
 	}
 }
 
-int			ftprintf_convert_i(t_printf *f)
+int	ftprintf_convert_i(t_printf *f)
 {
 	if (f->info.is_char)
 		f->data.signed_i = (char)va_arg(f->args, int);
@@ -75,7 +76,8 @@ int			ftprintf_convert_i(t_printf *f)
 		f->data.signed_i = va_arg(f->args, long long int);
 	else
 		f->data.signed_i = (int)va_arg(f->args, int);
-	if (!(f->conversion = ft_itoa(f->data.signed_i)))
+	f->conversion = ft_itoa(f->data.signed_i);
+	if (!f->conversion)
 		return (-1);
 	return (ftprintf_print_i(f));
 }
@@ -85,7 +87,7 @@ int			ftprintf_convert_i(t_printf *f)
 **	format specifiers [' '] & [+].
 */
 
-int			ftprintf_convert_ui(t_printf *f, const char *s)
+int	ftprintf_convert_ui(t_printf *f, const char *s)
 {
 	if (f->info.is_char)
 		f->data.unsign_i = (unsigned char)va_arg(f->args, int);
@@ -114,7 +116,7 @@ int			ftprintf_convert_ui(t_printf *f, const char *s)
 **	Special values are handled as strings.
 */
 
-int			ftprintf_convert_f(t_printf *f)
+int	ftprintf_convert_f(t_printf *f)
 {
 	char	*delim;
 
@@ -124,13 +126,14 @@ int			ftprintf_convert_f(t_printf *f)
 		f->conversion = ft_ftoa(va_arg(f->args, double), f->info.f_prec);
 	if (!f->conversion)
 		return (-1);
-	if (ft_strequ(f->conversion, "inf") || ft_strequ(f->conversion, "-inf") ||
-	ft_strequ(f->conversion, "nan"))
+	if (ft_strequ(f->conversion, "inf") || ft_strequ(f->conversion, "-inf")
+		|| ft_strequ(f->conversion, "nan"))
 	{
 		f->data.s = f->conversion;
 		return (ftprintf_print_str(f));
 	}
-	if ((delim = ft_strchr(f->conversion, '.')))
+	delim = ft_strchr(f->conversion, '.');
+	if (delim)
 		f->info.fract_i = ft_strlen(delim + 1);
 	return (ftprintf_print_f(f));
 }
